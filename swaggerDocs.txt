@@ -1,0 +1,1417 @@
+openapi: 3.0.3
+info:
+  title: Blog platform documentation api 
+  description: "This documentation made for local server. But it will be to work when update url to original url server."
+  contact:
+    email: artspoghosyan@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/
+    description: "development server"
+paths:
+    /auth/register:
+      post:
+        summary: "register user"
+        tags: 
+          - Authorization
+        description: "This endpoint made for the user who want to register"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required: 
+                  - name
+                  - email
+                  - password
+                properties:
+                  name: 
+                    type: string
+                    example: "Artur"
+                  email: 
+                    type: string
+                    example: artspoghosyan@gmail.com
+                  password: 
+                    type: string
+                    example: asdfghjkl123
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required: 
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "register is succesfully"
+          '400':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - type: object
+                      required: 
+                        - type
+                        - message
+                      properties:
+                        type: 
+                          type: string
+                          example: "email"
+                        message: 
+                          type: string
+                          example: "already there is user by this email"
+          '403':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/AuthorizationIgnoreError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /auth/login:
+      post:
+        tags: 
+          - Authorization
+        summary: "login user"
+        description: "This endpoint made for the user who want to login"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required: 
+                  - email
+                  - password
+                properties:
+                  email: 
+                    type: string
+                    example: artspoghosyan@gmail.com
+                  password: 
+                    type: string
+                    example: asdfghjkl123
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required: 
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "login is succesfully" 
+          '303':
+            description: "To e-mail sent key for login because from this device login cause first time"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: 
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "key for login already sent to e-mail"
+          '400':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - $ref: "#/components/schemas/ConfirmEmail" 
+          '404':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/NotFound"
+          '403':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/AuthorizationIgnoreError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /auth/login-other-client:
+      post:
+        tags: 
+          - Authorization
+        summary: "login user with key"
+        description: "This endpoint made for the login user when user first time login and key was sent to e-mail"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required: 
+                  - email
+                  - password
+                  - key
+                properties:
+                  email: 
+                    type: string
+                    example: artspoghosyan@gmail.com
+                  password: 
+                    type: string
+                    example: asdfghjkl123
+                  key:
+                    type: string
+                    example: 123456
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required: 
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "login is succesfully" 
+          '400':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - $ref: "#/components/schemas/ConfirmEmail"  
+                    - $ref: "#/components/schemas/KeyTimeError"  
+                    - $ref: "#/components/schemas/KeyError"  
+          '404':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/NotFound"
+          '403':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/AuthorizationIgnoreError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"              
+    /auth/forgot-password:
+      put:
+        tags: 
+          - Authorization
+        summary: "forgot password"
+        description: "This endpoint made for the user who forgot password"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required: 
+                  - email
+                properties:
+                  email: 
+                    type: string
+                    example: artspoghosyan@gmail.com
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required: 
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "password succesfully changed and sent to e-mail" 
+          '400':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - $ref: "#/components/schemas/ConfirmEmail"  
+          '404':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not found user"
+          '403':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/AuthorizationIgnoreError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /auth/receive-new-key:
+      post:
+        tags: 
+          - Authorization
+        summary: "receive new activate key"
+        description: "This endpoint made for the user who want to receive new key for activate account"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required: 
+                  - email
+                properties:
+                  email: 
+                    type: string
+                    example: artspoghosyan@gmail.com
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "new key already sent to e-mail" 
+          '400':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AlreadyConfirm"
+          '404':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/UserNotRegister"
+          '403':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/AuthorizationIgnoreError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /auth/confirm/{email}/{activateKey}:
+      get:
+        tags: 
+          - Authorization
+        summary: "confirm account"
+        description: "This endpoint made for the user who want to activate account" 
+        parameters: 
+          - in: path
+            name: email
+            required: true
+            schema:
+              type: string
+          - in: path 
+            name: activateKey
+            required: true
+            schema:
+              type: string
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  oneOf:
+                    - $ref: "#/components/schemas/SuccesConfirm"
+                    - $ref: "#/components/schemas/AlreadyConfirm"
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - $ref: "#/components/schemas/KeyConfirmError"
+          '404':
+            description: "Failed response"
+            content: 
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/UserNotRegister"
+          '403':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/AuthorizationIgnoreError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /auth/logout:
+      get:
+        tags: 
+          - Authorization
+        summary: "logout"
+        description: "This endpoint made for the user who want to logout"  
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "logout is succesfully"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+
+    /user/get:
+      get:
+        tags: 
+          - User
+        summary: "get user data"
+        description: "This endpoint made for get user data"
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "found"
+                    user: 
+                      $ref: "#/components/schemas/User"
+          
+          '404':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not found"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /user/remove:
+      delete:
+        tags: 
+          - User
+        summary: "delete user"
+        description: "This endpoint made for the user who want to delete account"
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "delete is succesfully"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /user/change-password:
+      put:
+        tags: 
+          - User
+        summary: "change password"
+        description: "This endpoint made for the user who want to change password"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - oldPassword
+                  - newPassword
+                properties:
+                  oldPassword:
+                    type: string
+                    example: "asdfghjkl123"
+                    minLength: 6
+                    maxLength: 100
+                  newPassword:
+                    type: string
+                    example: "example"
+                    minLength: 6
+                    maxLength: 100
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "password succesfully changed"
+          
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - type: object
+                      required:
+                        - type
+                        - message
+                      properties:
+                        type:
+                          type: string
+                          example: "password"
+                        message: 
+                          type: string
+                          example: "not valid old password"
+          '404':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not found user"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /user/change-name:
+      put:
+        tags: 
+          - User
+        summary: "change name"
+        description: "This endpoint made for user who want to change name"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    example: "ArtsPoghosyan"
+                    minLength: 8
+                    maxLength: 100
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "name succesfully changed"
+          
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ValidationError"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /user/change-email:
+      put:
+        tags: 
+          - User
+        summary: "change email"
+        description: "This endpoint made for user who want to change email"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                properties:
+                  name:
+                    type: string
+                    example: "artspoghosyan@gmail.com"
+                    minLength: 10
+                    maxLength: 100
+        responses:
+          '200': 
+            description: "Success response but automatic server will be logout and new activate key sent to new e-mail"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "email succesfully changed"
+          
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/ValidationError"
+                    - type: object
+                      required:
+                        - type
+                        - message
+                      properties:
+                        type:
+                          type: string
+                          example: "email"
+                        message: 
+                          type: string
+                          example: "there is already this email"
+          '404':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not found user"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+ 
+    /blog/get/:
+      post:
+        tags: 
+          - Blog
+        summary: "read blog"
+        description: "This endpoint made for the user who want to view blog(s). When we write blog=all in the query, we get all blogs. When we write blogId=any value in the query, we get exactly those blog's and when we write userId=any value in the query, we get those user's blogs"
+        parameters:
+          - in: query
+            name: blog
+            schema: 
+              type: string
+              example: "all"
+          - in: query
+            name: userId
+            schema: 
+              type: string
+              example: "57848488"
+          - in: query
+            name: blogId
+            schema: 
+              type: string
+              example: "54584544"
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  oneOf:
+                    - type: object
+                      required:
+                        - message
+                        - blogs
+                      properties:
+                        message: 
+                          type: string
+                          example: "read blogs is succesfully"
+                        blogs:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Blog"
+                    - type: object
+                      required:
+                        - message
+                        - blog
+                      properties:
+                        message: 
+                          type: string
+                          example: "read blog by blogId is succesfully"
+                        blog:
+                          $ref: "#/components/schemas/Blog"
+                    - type: object
+                      required:
+                        - message
+                        - blogs
+                      properties:
+                        message: 
+                          type: string
+                          example: "read blog by userId is succesfully"
+                        blogs:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Blog"
+          
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "read blog did failed because OR (not passed blog or blogId or userId) OR (is wrong)"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /blog/create:
+      post:
+        tags: 
+          - Blog
+        summary: "create blog"
+        description: "This endpoint made for the user who want to create new blog"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - title
+                  - body
+                  - authorName
+                properties:
+                  title:
+                    type: string
+                    example: "News from country"
+                    minLength: 6
+                    maxLength: 25
+                  body:
+                    type: string
+                    example: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                    minLength: 20
+                    maxLength: 1000
+                  authorName:
+                    type: string
+                    example: "Artur"
+                    minLength: 3
+                    maxLength: 10
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                    - blog
+                  properties:
+                    message: 
+                      type: string
+                      example: "create blog is succesfully"
+                    blog:
+                      $ref: "#/components/schemas/Blog"
+          
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ValidationError"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /blog/update:
+      put:
+        tags: 
+          - Blog
+        summary: "update blog"
+        description: "This endpoint made for the user who want to update blog"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - blogId
+                properties:
+                  blogId:
+                    type: string
+                    example: "185784584848"
+                  body:
+                    type: string
+                    example: "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+                    minLength: 20
+                    maxLength: 1000
+                  title:
+                    type: string
+                    example: "News country"
+                    minLength: 6
+                    maxLength: 25
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                    - blog
+                  properties:
+                    message: 
+                      type: string
+                      example: "update blog is succesfully"
+                    blog:
+                      $ref: "#/components/schemas/Blog"
+          '405': 
+            description: "Failed response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not permission on this user update this blog because he isn't owner this blog's"
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ValidationError"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /blog/delete:
+      post:
+        tags: 
+          - Blog
+        summary: "delete blog"
+        description: "This endpoint made for the user who want to delete blog"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - blogId
+                properties:
+                  blogId:
+                    type: string
+                    example: "185784584848"
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "delete blog is succesfully"
+          '405': 
+            description: "Failed response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not permission on this user update this blog because he isn't owner this blog's"
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not passed blogId"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+                  
+    /blog/comment/add:
+      post:
+        tags: 
+          - Comment
+        summary: "add comment in blog"
+        description: "This endpoint made for the user who want to add new comment in blog"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - blogId
+                  - content
+                properties:
+                  blogId:
+                    type: string
+                    example: "548451545158"
+                  content:
+                    type: string
+                    example: "Lorem Ipsum is simply dummy text of the printing."
+                    minLength: 6
+                    maxLength: 500
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                    - blog
+                  properties:
+                    message: 
+                      type: string
+                      example: "add comment is succesfully"
+                    blog:
+                      $ref: "#/components/schemas/Blog"
+          
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ValidationError"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /blog/comment/update:
+      post:
+        tags: 
+          - Comment
+        summary: "update comment"
+        description: "This endpoint made for the user who want to update comment"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - blogId
+                  - commentId
+                  - content
+                properties:
+                  blogId:
+                    type: string
+                    example: "548451545158"
+                  commentId:
+                    type: string
+                    example: "124515154"
+                  content:
+                    type: string
+                    example: "Lorem Ipsum is simply."
+                    minLength: 6
+                    maxLength: 500
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                    - blog
+                  properties:
+                    message: 
+                      type: string
+                      example: "update comment is succesfully"
+                    blog:
+                      $ref: "#/components/schemas/Blog"
+          '404': 
+            description: "Failed response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not found comment"
+          '400':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ValidationError"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+    /blog/comment/delete:
+      post:
+        tags: 
+          - Comment
+        summary: "delete comment"
+        description: "This endpoint made for the user who want to delete comment"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - blogId
+                  - commentId
+                properties:
+                  blogId:
+                    type: string
+                    example: "548451545158"
+                  commentId:
+                    type: string
+                    example: "124515154"
+        responses:
+          '200': 
+            description: "Success response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                    - blog
+                  properties:
+                    message: 
+                      type: string
+                      example: "delete comment is succesfully"
+                    blog:
+                      $ref: "#/components/schemas/Blog"
+          '400': 
+            description: "Failed response"
+            content:
+              application/json: 
+                schema: 
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    message: 
+                      type: string
+                      example: "not passed blogId or commentId"
+          '401':
+            description: "Failed response"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AuthorizationAcceptError"
+          '500':
+            description: "Error in server"
+            content:
+              application/json: 
+                schema:
+                  $ref: "#/components/schemas/ServerError"
+
+components:
+  schemas:
+    User:
+      type: object
+      required: 
+        - name
+        - email
+        - isActive
+      properties:
+        name: 
+          type: string
+          example: "Artur"
+        email: 
+          type: string
+          example: artspoghosyan@gmail.com
+        isActive:
+          type: boolean
+          example: true
+        activateKey:
+          type: string
+          example: "12345"
+          minLength: 4
+          maxLength: 4
+    Blog:
+      type: object
+      required: 
+        - _id
+        - title
+        - body
+        - author
+        - comments
+        - createdAt
+        - updatedAt
+      properties:
+        _id:
+          type: string
+          example: "5485548458415"
+        title:
+          type: string
+          example: "News from country"
+          minLength: 6
+          maxLength: 25
+        body:
+          type: string
+          example: "Lorem Ipsum is simply dummy text of the printing and type setting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+          minLength: 20
+          maxLength: 1000
+        author:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              example: "758454845454"
+            name: 
+              type: string
+              example: "Artur"
+              minLength: 3
+              maxLength: 10
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment" 
+        createdAt:
+          type: string
+          example: "23.01.2024t17:06"
+        updatedAt:
+          type: string
+          example: "23.01.2024t17:07"
+    Comment:
+      type: object
+      required: 
+        - id
+        - authorId
+        - content
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: "54154185454"
+        authorId:
+          type: string
+          example: "154845488"
+        content:
+          type: string
+          example: "Lorem Ipsum is simply dummy text of the printing and type setting industry."
+          minLength: 6
+          maxLength: 500
+        createdAt:
+          type: string
+          example: "23.01.2024t17:08"
+    ServerError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "The server has encountered a situation it does not know how to handle."
+    AuthorizationIgnoreError: 
+      type: object
+      required: 
+        - message
+      properties:
+        message: 
+          type: string
+          example: "user with permission couldn't be on this router"
+    AuthorizationAcceptError: 
+      type: object
+      required: 
+        - message
+      properties:
+        message: 
+          type: string
+          example: "user unauthorized"
+    UserNotRegister:
+      type: object
+      required:
+        - message
+      properties:
+        message: 
+          type: string
+          example: "user didn't register"
+    NotFound: 
+      type: object
+      required:
+        - message
+      properties:
+        message: 
+          type: string
+          example: "not found email or password"
+    ConfirmEmail:
+      type: object
+      required: 
+        - type
+        - message
+      properties:
+        type: 
+          type: string
+          example: "confirm"
+        message: 
+          type: string
+          example: "you didn't confirm your email"
+    KeyTimeError: 
+      type: object
+      required: 
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          example: "key time"
+        message:
+          type: string
+          example: "key time has passed"
+    KeyError: 
+      type: object
+      required: 
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          example: "key"
+        message:
+          type: string
+          example: "key isn't right"
+    KeyConfirmError: 
+      type: object
+      required: 
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          example: "key"
+        message:
+          type: string
+          example: "verification failed"
+    AlreadyConfirm:
+      type: object
+      required:
+        - message
+      properties:
+        message: 
+          type: string
+          example: "you are already approved"
+    SuccesConfirm:
+      type: object
+      required:
+        - message
+      properties:
+        message: 
+          type: string
+          example: "user successfully is confirm"
+    ValidationError:
+      type: object
+      properties:
+        type: 
+          type: string
+          example: "validation"
+        details: 
+          type: array
+          items: 
+            type: object
+            properties:
+              message: 
+                type: string
+                example: "\"name\" length must be at least 8 characters long"
+              path: 
+                type: array
+                items:
+                  type: string
+        _original:
+          type: object
+          properties:
+            name: 
+              type: string
+              example: "Art"
+            email: 
+              type: string
+              example: "A@gmail.com"
+            password: 
+              type: string
+              example: "123"
+ 

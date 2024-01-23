@@ -1,0 +1,17 @@
+Connecting this server requires several steps
+
+1. Open a terminal and type the following command "npm install"
+2. Create a file called ".env" in the main repository itself
+3. In the ".env" file, write the following one after the other "MODE='development or production'", "MONGODB_URL='your mongodb url'", "JWT_SECRET='random value'", "NODE_MAILER_USER='your gmail username'" and "NODE_MAILER_PASSWORD='your gmail secure code'".
+4. When the download is complete, type one of the following commands in the terminal "npm run dev" or "npm run start".
+5. When after writing the command in the terminal it is written, then everything is fine, I wish you a good time
+NodeMailer Connected
+Listening on port 4000
+Database Connected
+
+The server documentation is located in the swaggerDocs.txt file in the main repository, you can press "Ctrl + A" then access the following link https://editor.swagger.io/ and press "Ctrl + V" in the editor on the left.
+
+If there are any problems, you can contact me.
+Email -> artspoghosyan@gmail.com
+Phone -> +37493509248
+Linkedin -> https://www.linkedin.com/in/arts-poghosyan-b32118249/
